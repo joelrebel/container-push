@@ -72,6 +72,7 @@ jobs:
           revision="$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
           IMAGE="ghcr.io/${{ inputs.registry_org }}/${{ inputs.name }}"
           TAG_PARAMS="$(echo "${{ inputs.tags }},${revision}" | sed -e 's@^@-t '${IMAGE}':@g' -e 's@,@ -t '${IMAGE}':@g')"
+          echo ">> $TAG_PARAMS"
           docker build \
             -f ${{ inputs.dockerfile_path }} \
             "{TAG_PARAMS}" \
