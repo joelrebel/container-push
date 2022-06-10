@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       tag:
-        description: 'Container image tag to push. Normally it will be the GITHUB_REF_NAME env variable'
+        description: 'Container image tag(s) to push. Specify one or more tags separated by a comma (exclude whitespace). Defaults to GITHUB_REF_NAME env variable.'
         required: true
         type: string
       registry_org:
@@ -65,10 +65,11 @@ jobs:
       - name: Build container images
         run: |
           revision="$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
+          IMAGE="ghcr.io/${{ inputs.registry_org }}/${{ inputs.name }}"
+          TAG_PARAMS="$(echo "${{ inputs.tags }},${revision}" | sed -e 's@^@-t '${IMAGE}':@g' -e 's@,@ -t '${IMAGE}':@g')"
           docker build \
             -f ${{ inputs.dockerfile_path }} \
-            -t "ghcr.io/${{ inputs.registry_org }}/${{ inputs.name }}:${{ inputs.tag }}" \
-            -t "ghcr.io/${{ inputs.registry_org }}/${{ inputs.name }}:${revision}" \
+            "{TAG_PARAMS}" \
             --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
             --label "org.opencontainers.image.created=$(date --iso-8601=seconds)" \
             --label "org.opencontainers.image.title=${{ inputs.name }}" \
