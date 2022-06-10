@@ -11,6 +11,11 @@ on:
         description: 'Container image tag(s) to push. Specify one or more tags separated by a comma (exclude whitespace). Defaults to GITHUB_REF_NAME env variable.'
         required: true
         type: string
+      publish:
+        description: 'Publish the built docker image to the configured registry'
+        default: 'true'
+        required: false
+        type: string
       registry_org:
         description: 'The registry organization to push to'
         default: '${{ github.repository_owner }}'
@@ -80,6 +85,7 @@ jobs:
             ${{ inputs.build_context }}
 
       - name: Publish Container images
+        if: {{ inputs.push }} == 'true'
         run: docker push "ghcr.io/${{ inputs.registry_org }}/${{ inputs.name }}" --all-tags
 
       - name: Get container info
