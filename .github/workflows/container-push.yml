@@ -85,7 +85,7 @@ jobs:
             ${{ inputs.build_context }}
 
       - name: Publish Container images
-        if: {{ inputs.push }} == 'true'
+        if: ( ${{ inputs.publish }} == 'true' )
         run: docker push "ghcr.io/${{ inputs.registry_org }}/${{ inputs.name }}" --all-tags
 
       - name: Get container info
